@@ -105,10 +105,22 @@ test('スノースマイルのデータが解析できる', () => {
   const tagIds = chorus.flatMap((c, i) => analyzeChord(c, key, chorus[i - 1], chorus[i + 1]).tags.map((t) => t.id));
   assert.ok(tagIds.includes('passing-dim'));
   assert.ok(tagIds.includes('sharp4-m7b5'));
-  const pats = detectPatterns(sections, key).map((p) => p.id);
-  assert.ok(pats.includes('two-five-one'));
-  assert.ok(pats.includes('bass-down'));
-  assert.ok(pats.includes('bass-up'));
+  // 曲の構成（form）順で進行を検出する
+  const indexed = sections.map((s, si) => ({ ...s, si }));
+  const form = snowSmile.form.map((id) => indexed.find((s) => s.id === id));
+  assert.ok(form.every(Boolean), 'form は存在するセクションだけを参照する');
+  const pats = detectPatterns(form, key);
+  const ids = pats.map((p) => p.id);
+  assert.ok(ids.includes('four-five-one'));
+  assert.ok(ids.includes('bass-up'));
+  // Aメロ：ベースが C# から 1 オクターブ以上下りる
+  const longDown = pats.find((p) => p.id === 'bass-down' && p.chords.length >= 9);
+  assert.ok(longDown, 'Aメロの長い下行ベースを検出');
+  assert.equal(indexed[longDown.start.si].id, 'verse');
+  // サビ：Adim を含む半音の上行ベース
+  assert.ok(pats.some((p) => p.id === 'bass-up' && p.chromatic && p.chords.some((c) => c.symbol === 'Adim')));
+  // 全セクションが照合済み
+  assert.ok(snowSmile.sections.every((s) => s.confidence === 'referenced'));
   // 歌詞を含まない（譜面テキストはコードと区切り記号のみ）
   for (const s of snowSmile.sections) {
     for (const tok of s.chart.split(/[\s|]+/).filter(Boolean)) assert.ok(parseChord(tok), tok);

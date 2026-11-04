@@ -74,6 +74,7 @@ const QUALITY_TABLE = {
   maj: Q('maj', [0, 4, 7], 'メジャー'),
   add9: Q('maj', [0, 4, 7, 14], 'アドナインス'),
   add2: Q('maj', [0, 2, 4, 7], 'アドツー'),
+  add11: Q('maj', [0, 4, 7, 17], 'アドイレブンス'),
   '6': Q('maj', [0, 4, 7, 9], 'シックス'),
   '69': Q('maj', [0, 4, 7, 9, 14], 'シックスナインス'),
   M7: Q('maj', [0, 4, 7, 11], 'メジャーセブンス'),
@@ -438,7 +439,8 @@ export function detectPatterns(sections, key) {
   // 全コードを位置情報つきで平坦化
   // 繰り返し（repeat）は展開して、繰り返しの頭へ戻る進行も検出できるようにする
   const flat = [];
-  sections.forEach((sec, si) => {
+  sections.forEach((sec, i) => {
+    const si = sec.si ?? i; // 曲の構成順（form）で渡された場合も元のセクション番号で記録
     for (let r = 0; r < (sec.repeat ?? 1); r++) {
       sec.bars.forEach((bar, bi) => bar.forEach((chord, ci) => flat.push({ chord, si, bi, ci })));
     }

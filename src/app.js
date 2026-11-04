@@ -61,8 +61,12 @@ function prepare(song) {
     item.ref = `${item.si}-${item.bi}-${item.ci}`;
   });
   const lookup = new Map(flat.map((it) => [it.ref, it]));
-  const patterns = detectPatterns(sections, key);
-  return { song, key, sections, flat, lookup, patterns };
+  // 曲の構成（form）があれば、その順番で並べて進行を検出する（セクションをまたぐ進行も拾える）
+  const form = (song.form ?? sections.map((s) => s.id))
+    .map((id) => sections.find((s) => s.id === id))
+    .filter(Boolean);
+  const patterns = detectPatterns(form, key);
+  return { song, key, sections, form, flat, lookup, patterns };
 }
 
 let current = null; // 表示中の曲モデル
@@ -290,7 +294,12 @@ function songTab(tab) {
 
 function chartTab() {
   const est = current.sections.some((s) => s.confidence === 'estimated');
+  const formLine = current.song.form
+    ? `<p class="form-line"><span class="tool-label">曲の構成</span> ${current.form.map((s) => `<a href="#sec-${s.si}" class="chip ghost">${esc(s.name)}</a>`).join('<span class="arrow">→</span>')}</p>`
+    : '';
   return `
+    ${formLine}
+    ${current.song.chartNote ? `<p class="muted small">${esc(current.song.chartNote)}</p>` : ''}
     ${est ? `<p class="notice">「推定・要検証」のセクションは、曲中で使われるコードから組み立てた暫定データです。正確な譜面は<a href="#/song/${esc(current.song.id)}?tab=sources">出典</a>のサイトで確認してください。</p>` : ''}
     <p class="muted small">歌詞は掲載していません（著作権保護のため）。コードの並びと度数のみを表示しています。</p>
     ${current.sections.map((_, si) => sectionCard(current, si)).join('')}`;
@@ -345,8 +354,9 @@ function keyTab() {
   const m = current;
   const s = m.song;
   const changes = s.keyChanges ?? [{ section: m.sections[0]?.id, key: s.key, type: 'original' }];
-  const segs = m.sections.map((sec) => {
-    const kc = [...changes].reverse().find((c) => m.sections.findIndex((x) => x.id === c.section) <= sec.si) ?? changes[0];
+  // 構成順（form）に並べ、各区間のキーを求める。keyChanges の section は form 上の位置（formIndex）でも指定できる
+  const segs = m.form.map((sec, fi) => {
+    const kc = [...changes].reverse().find((c) => (c.formIndex ?? m.form.findIndex((x) => x.id === c.section)) <= fi) ?? changes[0];
     return { sec, key: parseKey(kc.key) };
   });
   const modulations = changes.filter((c) => c.type !== 'original');
@@ -363,6 +373,7 @@ function keyTab() {
       <span class="seg-name">${esc(sec.name)}</span><span class="seg-key">${pretty(keyFromPc(key.pc + shift).name)}</span></div>`).join('')}</div>
     ${modulations.length ? `<ul>${modulations.map((c) => `<li><b>${esc(c.section)}</b>：${pretty(c.key)} へ転調（${esc(c.type)}）${esc(c.note ?? '')}</li>`).join('')}</ul>`
       : `<p><b>転調：なし</b>　${esc(changes[0].note ?? '')}</p>`}
+    <p class="muted small">帯の長さは各セクションの小節数の目安です。</p>
     ${lessonLink('modulation', '転調の種類を学ぶ')}
   </section>
 

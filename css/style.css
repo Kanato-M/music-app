@@ -86,6 +86,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 120px; }
 main > section, main > article { margin-bottom: 28px; }
 .site-foot { text-align: center; color: var(--muted); font-size: .8rem; padding: 24px 16px 40px; }
+.form-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 8px; }
+.form-line .chip:hover { text-decoration: none; border-color: var(--accent); color: var(--accent); }
 .crumbs { font-size: .85rem; color: var(--muted); margin-bottom: 12px; }
 
 .panel {
@@ -244,8 +246,8 @@ button[type=submit], #save-song, .analyze-form button {
 .bars-chart .n { text-align: right; color: var(--muted); }
 
 /* キー */
-.timeline { display: flex; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-.timeline .seg { background: var(--accent-soft); border-radius: 0; padding: 8px 10px; border-right: 2px solid var(--surface); min-width: 0; }
+.timeline { display: flex; border-radius: 10px; overflow-x: auto; margin-bottom: 12px; }
+.timeline .seg { background: var(--accent-soft); border-radius: 0; padding: 8px 10px; border-right: 2px solid var(--surface); min-width: 4.6em; }
 .seg-name { display: block; font-size: .75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .seg-key { font-weight: 700; color: var(--accent); }
 .capo { margin: 0; padding-left: 1.2em; }
