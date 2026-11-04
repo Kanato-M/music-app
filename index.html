@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>コード進行ラボ</title>
+  <meta name="description" content="曲名から、その曲のコード進行・転調・音楽理論を学べるアプリ">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-head">
+    <a class="logo" href="#/"><span class="logo-mark" aria-hidden="true">♪</span>コード進行ラボ</a>
+    <nav class="nav">
+      <a href="#/">曲を探す</a>
+      <a href="#/theory">音楽理論</a>
+      <a href="#/analyze">コードを入力</a>
+      <a href="#/about">データ方針</a>
+    </nav>
+  </header>
+  <main id="main"></main>
+  <aside id="chord-info" class="chord-info" hidden aria-live="polite"></aside>
+  <footer class="site-foot">
+    歌詞・コード譜の転載は行っていません。正確な譜面は各コード譜サイトでご確認ください。
+  </footer>
+  <noscript>このアプリは JavaScript を有効にしてご利用ください。</noscript>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
